@@ -14,9 +14,11 @@ def filtering(data):
 
 # data enrichment
 def categorise(desc):
-    if "UBER* TRIPUBER.COM" in desc:
+    if "UBER* TRIP" in desc:
         return "Taxi"
-    elif "UBER* EATSUBER.COM" in desc:
+    elif "SNAPPER" in desc:
+        return "Public transport"
+    elif "UBER* EAT" in desc:
         return "Food delivery (uber eats)"
     elif "HELL PIZZA" in desc:
         return "Food delivery"
@@ -32,6 +34,10 @@ def categorise(desc):
         return "Groceries"
     elif "FRESH CHOICE" in desc:
         return "Groceries"
+    elif "FOUR SQUARE" in desc:
+        return "Groceries"
+    elif "NIGHT'N'DAY" in desc:
+        return "Groceries"
     elif "WHITCOULLS" in desc:
         return "Stationery"
     elif "UNITY BOOKSWELLINGTON" in desc:
@@ -40,11 +46,17 @@ def categorise(desc):
         return "Stationery"
     elif "SPARK PAY MONTHLY" in desc:
         return "Mobile"
+    elif "SUSTAINABILITYTR" in desc:
+        return "Power"
     elif "GRAMMARLY" in desc:
         return "Subscriptions"
     elif "OPENAI *CHATGPT SUBSCR" in desc:
         return "Subscriptions"
+    elif "Spotify" in desc:
+        return "Subscriptions"
     elif "WAXNLASERLOWER HUTT" in desc:
+        return "Beauty"
+    elif "Waxnlaser" in desc:
         return "Beauty"
     elif "CHEMIST WAREHOUSE" in desc:
         return "Home & Hygiene"

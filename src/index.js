@@ -5,17 +5,11 @@ import * as d3 from 'd3';
 
 d3.csv("/transactions_cleaned.csv").then(data => {
 
-    const width = 928;
-    const height = 924;
+    const width = 600;
+    const height = 400;
 
-    function tile(node, x0, y0, x1, y1) {
-        d3.treemapBinary(node, 0, 0, width, height);
-        for (const child of node.children) {
-            child.x0 = x0 + child.x0 / width * (x1 - x0);
-            child.x1 = x0 + child.x1 / width * (x1 - x0);
-            child.y0 = y0 + child.y0 / height * (y1 - y0);
-            child.y1 = y0 + child.y1 / height * (y1 - y0);
-        }}
+    let currentCategoryShown = null;
+
 
     const categoryTotals = d3.rollups(
         data.filter(d => parseFloat(d.Amount) < 0),
@@ -42,30 +36,80 @@ d3.csv("/transactions_cleaned.csv").then(data => {
     d3.treemap()
         .size([600, 400])
         .padding(2)(root);
-    
 
-    const svg = d3.select("body")
-        .append("svg")
-        .attr("width", 600)
-        .attr("height", 400);
+    const svg = d3.select("#treemap").append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
-    const nodes = svg.selectAll("g")
-        .data(root.leaves())
-        .enter()
-        .append("g")
-        .attr("transform", d => `translate(${d.x0},${d.y0})`);
+    let currentRoot = root;
 
-    nodes.append("rect")
-        .attr("width", d => d.x1 - d.x0)
-        .attr("height", d => d.y1 - d.y0)
-        .attr("fill", d => d3.interpolateSpectral(Math.random()));
+    function render(node) {
+        svg.selectAll("*").remove();
 
-    nodes.append("text")
-        .attr("x", 3)
-        .attr("y", 14)
-        .text(d => `${d.data.name}: $${d.value.toFixed(2)}`);
+        const nodes = node.leaves();
+        console.log("Rendering nodes:", nodes);
+
+        const g = svg.selectAll("g")
+            .data(nodes)
+            .enter()
+            .append("g")
+            .attr("transform", d => `translate(${d.x0},${d.y0})`);
+
+        g.append("rect")
+            .attr("width", d => d.x1 - d.x0)
+            .attr("height", d => d.y1 - d.y0)
+            .attr("fill", d => d3.interpolateSpectral(Math.random()));
+
+        g.append("text")
+            .attr("x", 4)
+            .attr("y", 14)
+            .style("fill", "#fff")
+            .style("font-size", "10px")
+            .text(d => `${d.data.name}: $${d.value.toFixed(2)}`);
+
+        g.on("click", (event, d) => {
+            if (currentCategoryShown === d.data.name) {
+                // Same category clicked again, toggle OFF
+                d3.select("#details").html("");
+                currentCategoryShown = null;
+            } else {
+                // Show transactions
+                showTransactions(d.data.name);
+                currentCategoryShown = d.data.name;
+            }
+        })
+
+    }
+
+
+// Initial draw
+    render(root);
+
+    function showTransactions(categoryName) {
+        const details = d3.select("#details");
+        details.html(""); // очищаем div
+
+        details.append("h3").text(`Transactions for ${categoryName}`);
+
+        const filtered = data.filter(d => d.Category === categoryName);
+
+        const table = details.append("table").style("border-collapse", "collapse");
+        const header = table.append("tr");
+        header.append("th").text("Date").style("border", "1px solid #ccc").style("padding", "4px");
+        header.append("th").text("Payee").style("border", "1px solid #ccc").style("padding", "4px");
+        header.append("th").text("Amount").style("border", "1px solid #ccc").style("padding", "4px");
+
+        filtered.forEach(tran => {
+            const row = table.append("tr");
+            row.append("td").text(tran.Date).style("border", "1px solid #ccc").style("padding", "4px");
+            row.append("td").text(tran.Payee).style("border", "1px solid #ccc").style("padding", "4px");
+            row.append("td").text(parseFloat(tran.Amount).toFixed(2)).style("border", "1px solid #ccc").style("padding", "4px");
+        });
+    }
+
+    return svg.node();
+
 });
-
 
 function component() {
     const element = document.createElement('div');
