@@ -2,8 +2,8 @@ import pandas as pd
 
 # load data
 
-df = pd.read_csv("/Users/mariapogorelova/WebstormProjects/finance_tracker/data/raw/Export20250628115905.csv",
-                 skiprows=5)
+df = pd.read_csv("/Users/mariapogorelova/WebstormProjects/finance_tracker/data/raw/Export20250712190202.csv",
+                 skiprows=6)
 print(df.head())
 
 
@@ -12,66 +12,39 @@ def filtering(data):
     return filtered
 
 
-# data enrichment
+BUSINESS_CATEGORIES = {
+    "Taxi":                         ["uber* trip"],
+    "Public transport":            ["snapper"],
+    "Food delivery (uber eats)":   ["uber* eat"],
+    "Food delivery":               ["hell pizza"],
+    "Food delivery (groceries)":   ["milkrunfavona"],
+    "Internet":                    ["net speed data ltd"],
+    "Hotels":                      ["bkg*hotel"],
+    "Eating out":                  ["tj katsu", "picnic cafe", "maki mono", "angry ramen", "subway", "mcdonalds", "1154", "midnight", "le bouillonbel", "st pierres"],
+    "Airplane tickets":            ["air new zealand", "air nZ "],
+    "Rent":                        ["tinakori rd", "pmt to fc06-0606-0100241-00"],
+    "Groceries":                   ["new world", "woolworths", "fresh choice",
+                                    "four square", "night'n'day", "moore wilsons", "pak n save", "shelly bay baker"],
+    "Stationery":                  ["whitcoulls", "unity books", "campus bookslimited wellington"],
+    "Mobile":                      ["spark pay monthly"],
+    "Power":                       ["sustainabilitytr"],
+    "Subscriptions":               ["grammarly", "openai", "spotify"],
+    "Beauty":                      ["waxnlaser", "the body shop", "colleen"],
+    "Home & Hygiene":              ["chemist warehouse", "the warehouse", "3 dollar japan", "bunnings", "bbb"],
+    "Vending":                     ["coca-cola", "push developments"],
+    "Coffee":                      ["the lab"],
+    "Breakfast out":               ["crazy rabbitcafe wellington", "hataitai hotbread s wellington"],
+    "Photography":                 ["splendid photo"],
+    "Pharmacy":                    ["unichem", "after hourspharmacy"],
+    "Sport":                       ["vuw recreation"],
+    "Shopping":                    ["lululemon", "mecca", "kathmandu", "macpac", "pagani", "area 51", "platypus", "levi", "peter alexander", "the fittingroom", "max fashion", "cotton on"],
+}
+
 def categorise(desc):
-    if "UBER* TRIP" in desc:
-        return "Taxi"
-    elif "SNAPPER" in desc:
-        return "Public transport"
-    elif "UBER* EAT" in desc:
-        return "Food delivery (uber eats)"
-    elif "HELL PIZZA" in desc:
-        return "Food delivery"
-    elif "Net Speed Data Ltd" in desc:
-        return "Internet"
-    elif "MILKRUNFavona" in desc:
-        return "Food delivery (groceries)"
-    elif "Tinakori Rd" in desc:
-        return "Rent"
-    elif "NEW WORLD" in desc:
-        return "Groceries"
-    elif "WOOLWORTHS" in desc:
-        return "Groceries"
-    elif "FRESH CHOICE" in desc:
-        return "Groceries"
-    elif "FOUR SQUARE" in desc:
-        return "Groceries"
-    elif "NIGHT'N'DAY" in desc:
-        return "Groceries"
-    elif "WHITCOULLS" in desc:
-        return "Stationery"
-    elif "UNITY BOOKSWELLINGTON" in desc:
-        return "Stationery"
-    elif "Campus BooksLimited Wellington" in desc:
-        return "Stationery"
-    elif "SPARK PAY MONTHLY" in desc:
-        return "Mobile"
-    elif "SUSTAINABILITYTR" in desc:
-        return "Power"
-    elif "GRAMMARLY" in desc:
-        return "Subscriptions"
-    elif "OPENAI *CHATGPT SUBSCR" in desc:
-        return "Subscriptions"
-    elif "Spotify" in desc:
-        return "Subscriptions"
-    elif "WAXNLASERLOWER HUTT" in desc:
-        return "Beauty"
-    elif "Waxnlaser" in desc:
-        return "Beauty"
-    elif "CHEMIST WAREHOUSE" in desc:
-        return "Home & Hygiene"
-    elif "COCA-COLA" in desc:
-        return "Vending"
-    elif "PUSH DEVELOPMENTS LOWER HUTT" in desc:
-        return "Vending"
-    elif "THE LAB" in desc:
-        return "Coffee"
-    elif "Crazy RabbitCafe Wellington" in desc:
-        return "Breakfast out"
-    elif "Hataitai HotBread S Wellington" in desc:
-        return "Breakfast out"
-    elif "SPLENDID PHOTO WELLINGTON" in desc:
-        return "Photography"
+    desc = str(desc).lower()
+    for category, patterns in BUSINESS_CATEGORIES.items():
+        if any(pat in desc for pat in patterns):
+            return category
     return "Other"
 
 
