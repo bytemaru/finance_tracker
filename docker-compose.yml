@@ -1,0 +1,55 @@
+services:
+  redis:
+    image: redis:7.0.11-alpine
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3.11.13-management
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "15672:15672"
+
+  hadoop:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+    restart: unless-stopped
+    environment:
+      - CLUSTER_NAME=testcluster
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+    volumes:
+      - ./hadoop/data/name:/hadoop/dfs/name
+
+  web:
+    build: .
+    image: finance_tracker_web:latest
+    command: flask run --host=0.0.0.0 --port=3001
+    ports:
+      - "3001:3001"
+    environment:
+      FLASK_APP: flaskr
+      FLASK_ENV: development
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      - redis
+      - rabbitmq
+      - hadoop
+
+  worker:
+    build: .
+    image: finance_tracker_worker:latest
+    command: celery -A flaskr.celery_app worker --loglevel=info
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      - redis
+      - rabbitmq
+      - hadoop
