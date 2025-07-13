@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FinanceTracker — Upload ASB CSV</title>
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen">
+
+  <main class="w-full max-w-lg bg-white p-8 rounded-lg shadow">
+     <!-- ALERT -->
+    {% if message %}
+      <div
+        class="mb-6 p-4 rounded border
+               {% if '❗' in message %}bg-red-100 border-red-400 text-red-700
+               {% else %}bg-green-100 border-green-400 text-green-700{% endif %} break-all">
+        {{ message }}
+      </div>
+    {% endif %}
+    <h2 class="text-2xl font-semibold mb-4 text-center">Upload Your ASB CSV Export</h2>
+    <p class="mb-6 text-center">
+      Please upload the CSV file you downloaded from <strong>ASB online banking</strong>.
+      Expected columns: Date, Unique Id, Tran Type, Cheque Number, Payee, Memo, Amount.
+    </p>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+      <div>
+        <label for="file" class="block text-sm font-medium mb-2">Select CSV File</label>
+        <input
+          id="file"
+          name="file"
+          type="file"
+          accept=".csv"
+          required
+          class="block w-full text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg cursor-pointer focus:ring-blue-500 focus:border-blue-500"
+        >
+      </div>
+      <button
+        type="submit"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
+      >
+        Upload &amp; Process
+      </button>
+    </form>
+
+    <section class="mt-8 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
+      <h3 class="text-lg font-semibold mb-2">What Happens Next?</h3>
+      <ul class="list-disc list-inside space-y-1">
+        <li>Chunking of large files for efficient processing</li>
+        <li>Deduplication of records to avoid double-loading</li>
+        <li>Meta data storage in Redis</li>
+        <li>Export to data lake (HDFS) and analytics database</li>
+          <li>Access visualisatons in finance tracker portal</li>
+      </ul>
+    </section>
+
+    <section class="mt-6 p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+      <h3 class="text-xl font-semibold mb-3">Visualisation Portal</h3>
+      <ul class="list-disc list-inside space-y-1 mb-4">
+        <p class="mb-4">
+        Once your CSV is processed, head over to the portal to explore an interactive <strong>treemap</strong> of your transaction history. Each rectangle represents a category (e.g. Groceries, Rent, Taxi), sized proportionally to your spending or income in that category.
+       </p>
+        <li>Hover over any block to see exact totals and transaction counts.</li>
+        <li>Filter by date range to focus on specific months or years.</li>
+      </ul>
+      <p class="text-sm">
+        Instantly spot anomalies, optimize your budget, and make data-driven financial decisions.
+        Transactions from ASB are processed in real time and rendered in clear, beautiful graphics.
+      </p>
+    </section>
+  </main>
+
+</body>
+</html>
