@@ -3,7 +3,7 @@ LABEL authors="mariapogorelova"
 
 FROM python:3.9-slim
 
-WORKDIR /app
+WORKDIR /finance_tracker
 
 COPY requirements.txt .
 
